@@ -1,8 +1,10 @@
 #!/bin/bash
 
 PLANSZA=("-" "-" "-" "-" "-" "-" "-" "-" "-")
-GRACZ="X"
+GRACZ="O"
 WYGRANA=0
+SLOT=""
+RYWAL="player"
 
 function wyswietlPlansze
 {
@@ -47,37 +49,81 @@ function sprawdzWygrana
     return 0
 }
 
+function zapiszGre
+{
+    echo ${PLANSZA[*]} > ".$1.txt"
+    echo $GRACZ >> ".$1.txt"
+}
+
 function ruch
 {
-    NR_POLA=-1
+    USER_INPUT=-1
     echo "Pora na ruch $GRACZ"
    
-    while [ $NR_POLA -eq -1 ];
+    while [ $USER_INPUT -eq -1 ];
     do
-	while [ $NR_POLA -gt 9 ] || [ $NR_POLA -lt 1 ];
-        do	
-            echo "Podaj numer pola od 1 do 9"     
-	    read NR_POLA
-	    if [[ ! "$NR_POLA" =~ ^[0-9]+$ ]];
+        while [ $USER_INPUT -gt 9 ] || [ $USER_INPUT -lt 1 ];
+        do    
+            if [[ $GRACZ == "X" && $RYWAL!="player" ]]
             then
-		echo "bledne dane"
-	        NR_POLA=-1
+                USER_INPUT=$((1 + $RANDOM % 9))
+            else
+                echo "Podaj numer pola od 1 do 9"
+                echo "Podaj s i numer slotu od 1 do 9 aby zapisac gre (np. s1)"
+                read USER_INPUT
+            fi
+
+            if [[ "$USER_INPUT" =~ ([s])([1-9])$ ]];
+            then
+                echo "zapisuje gre w slocie $USER_INPUT"
+                zapiszGre $USER_INPUT
+                USER_INPUT=-1
+                continue
+            fi
+            if [[ ! "$USER_INPUT" =~ ^[1-9]+$ ]];
+            then
+                echo "bledne dane"
+                USER_INPUT=-1
+                continue
             fi
         done
-	NR_POLA=$((NR_POLA-1))
-        if [ "${PLANSZA[$NR_POLA]}" != "-" ];
-	then
+        USER_INPUT=$((USER_INPUT-1))
+        if [ "${PLANSZA[$USER_INPUT]}" != "-" ];
+        then
             echo "To pole jest juz zajete"
-	    NR_POLA=-1
-	fi
+            USER_INPUT=-1
+        fi
     done
    
-    PLANSZA[NR_POLA]=$GRACZ
+    PLANSZA[USER_INPUT]=$GRACZ
 }
 
 function odpalGre
 {
     NR_RUCHU=0
+
+    if [ "$#" -ge 1 ]
+    then
+        if [[ $1 =~ ([s])([1-9])$ ]];
+        then
+            if [ -e ".$1.txt" ]
+            then
+                echo "wczytuje gre ze slotu $1"
+                PIERWSZ_LINIA=$(sed -n '1p' .$1.txt)
+                PLANSZA=($PIERWSZ_LINIA)
+                GRACZ=$(sed -n '2p' .$1.txt)
+                for i in ${PLANSZA[@]}
+                do
+                    if [ "$i" != "-" ]
+                    then
+                        NR_RUCHU=$((NR_RUCHU+1))
+                    fi
+                done
+            fi
+        fi
+    fi
+    
+    sleep 1
     wyswietlPlansze
     while [ $NR_RUCHU -lt 9 ];
     do
@@ -102,4 +148,13 @@ function odpalGre
     echo "remis"
 }
 
-odpalGre
+
+while getopts :s:b: option;
+do
+  case "${option}" in
+    s) SLOT="$OPTARG";;
+    b) RYWAL="bot";;
+  esac
+done
+
+odpalGre $SLOT
