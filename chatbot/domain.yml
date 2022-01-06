@@ -1,0 +1,67 @@
+version: "3.0"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - open_hours
+  - menu
+
+responses:
+  utter_greet:
+  - text: "Hey! How are you?"
+  - text: "Hi!"
+  - text: "Hello :)"
+ 
+
+  utter_cheer_up:
+  - text: "Here is something to cheer you up:"
+    image: "https://i.imgur.com/nGF1K8f.jpg"
+
+  utter_did_that_help:
+  - text: "Did that help you?"
+
+  utter_happy:
+  - text: "Great, carry on!"
+
+  utter_goodbye:
+  - text: "Bye"
+
+  utter_iamabot:
+  - text: "I am a bot, powered by Rasa."
+  
+  utter_open_hours:
+  - text: "Monday open from 8 to 20 
+  
+      Tuesday open from 8 to 20 
+      
+      Wednesday open 10 to 16 
+      
+      Thursday open from 8 to 20 
+      
+      Friday open from 8 to 20 
+      
+      Saturday open 10 to 16 
+      
+      Sunday closed"
+     
+  utter_menu:
+  - text: "Lasagne, price: 16, preparation time: 1h
+
+       Pizza, price: 12, preparation time: 0.5h
+
+       Hot-dog, price: 4, preparation time: 0.1h
+
+       Burger, price: 12.5, preparation time: 0.2h
+
+       Spaghetti Carbonara, price: 15, preparation time: 0.5h
+
+       Tiramisu, price: 11, preparation time: 0.15h"
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
