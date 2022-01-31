@@ -16,7 +16,7 @@ app:get("get categories", "/categories", function(self)
 end)
 
 
-app:post("get categories", "/categories", function(self)
+app:post("add categories", "/categories", function(self)
 	categories.addCategory(self.params.kategoria)
 	return {status=200}
 end)
